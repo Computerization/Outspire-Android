@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.computerization.outspire.designsystem.AppRadius
 import com.computerization.outspire.designsystem.AppSpace
+import com.computerization.outspire.designsystem.OutspireScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,17 +36,14 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = AppSpace.md, vertical = AppSpace.lg),
-        verticalArrangement = Arrangement.spacedBy(AppSpace.cardSpacing),
-    ) {
-        Text(
-            text = "Settings",
-            style = MaterialTheme.typography.displayLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
+    OutspireScreen(title = "Settings") { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = AppSpace.md, vertical = AppSpace.lg),
+            verticalArrangement = Arrangement.spacedBy(AppSpace.cardSpacing),
+        ) {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -58,16 +56,17 @@ fun SettingsScreen(
                 modifier = Modifier.padding(AppSpace.cardPadding),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
+                val placeholder = "-"
                 Text("Account", style = MaterialTheme.typography.titleMedium)
-                Text("Student ID · ${state.user?.studentId ?: "—"}")
-                Text("Username · ${state.user?.username ?: "—"}")
+                Text("Student ID - ${state.user?.studentId ?: placeholder}")
+                Text("Username - ${state.user?.username ?: placeholder}")
             }
         }
 
         var expanded by remember { mutableStateOf(false) }
         val selectedLabel = state.yearOptions
             .firstOrNull { it.id == state.currentYearId }?.name
-            ?: "—"
+            ?: "-"
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -104,7 +103,8 @@ fun SettingsScreen(
             enabled = !state.loggingOut,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (state.loggingOut) "Signing out…" else "Logout")
+            Text(if (state.loggingOut) "Signing out..." else "Logout")
+        }
         }
     }
 }

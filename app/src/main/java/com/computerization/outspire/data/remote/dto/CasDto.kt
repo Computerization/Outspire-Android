@@ -2,6 +2,7 @@ package com.computerization.outspire.data.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class GroupDto(
@@ -39,7 +40,8 @@ data class ReflectionDto(
     @SerialName("Title") val title: String? = null,
     @SerialName("Summary") val summary: String? = null,
     @SerialName("Content") val content: String? = null,
-    @SerialName("Outcome") val outcome: Int? = null,
+    @SerialName("Outcome") val outcome: JsonElement? = null,
+    @SerialName("OutcomeIdList") val outcomeIdList: List<Int> = emptyList(),
 )
 
 @Serializable

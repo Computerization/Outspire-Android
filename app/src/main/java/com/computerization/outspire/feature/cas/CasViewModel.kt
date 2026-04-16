@@ -44,6 +44,19 @@ class CasViewModel @Inject constructor(
     fun retryMyClubs() = loadMyClubs()
     fun retryEvaluation() = loadEvaluation()
 
+    fun refresh() {
+        val s = _state.value
+        if (s.selectedGroup != null) {
+            retryGroupDetail()
+            return
+        }
+        when (s.selectedTab) {
+            CasTab.MyClubs -> loadMyClubs()
+            CasTab.Browse -> retryBrowse()
+            CasTab.Evaluation -> loadEvaluation()
+        }
+    }
+
     fun openGroup(group: DomainCasGroup) {
         _state.update {
             it.copy(

@@ -10,17 +10,24 @@ import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.json.Json
 
 @Singleton
 class CasService @Inject constructor(
     private val client: HttpClient,
     private val authService: AuthService,
 ) {
+    private val json = Json {
+        ignoreUnknownKeys = true
+        explicitNulls = false
+        isLenient = true
+    }
 
     suspend fun getMyGroups(): List<GroupDto> = authService.withAuthRetry {
         val env: ApiEnvelope<List<GroupDto>> = client.post("/Stu/Cas/GetMyGroupList") {
@@ -65,16 +72,19 @@ class CasService @Inject constructor(
     }
 
     suspend fun getReflections(groupId: String): List<ReflectionDto> = authService.withAuthRetry {
-        val env: ApiEnvelope<PagedEnvelope<ReflectionDto>> =
-            client.post("/Stu/Cas/GetReflectionList") {
-                form(
-                    mapOf(
-                        "pageIndex" to "1",
-                        "pageSize" to "100",
-                        "groupId" to groupId,
-                    )
+        val raw = client.post("/Stu/Cas/GetReflectionList") {
+            form(
+                mapOf(
+                    "pageIndex" to "1",
+                    "pageSize" to "100",
+                    "groupId" to groupId,
                 )
-            }.body()
+            )
+        }.bodyAsText()
+        val env: ApiEnvelope<PagedEnvelope<ReflectionDto>> = json.decodeFromString(
+            ApiEnvelope.serializer(PagedEnvelope.serializer(ReflectionDto.serializer())),
+            sanitizeReflectionJson(raw),
+        )
         env.require("GetReflectionList")?.List.orEmpty()
     }
 
@@ -148,6 +158,11 @@ class CasService @Inject constructor(
         env.require("GetEvaluateData") ?: EvaluationDto()
     }
 }
+
+private fun sanitizeReflectionJson(raw: String): String = raw
+    // Backend occasionally injects raw CR/LF into JSON strings (e.g. "</\r\np>"), which is invalid JSON.
+    .replace("\r", "")
+    .replace("\n", "")
 
 private fun io.ktor.client.request.HttpRequestBuilder.form(fields: Map<String, String>) {
     contentType(ContentType.Application.FormUrlEncoded)
