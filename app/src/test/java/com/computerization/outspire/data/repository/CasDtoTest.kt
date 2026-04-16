@@ -10,6 +10,7 @@ import com.computerization.outspire.data.remote.dto.ReflectionDto
 import com.computerization.outspire.data.repository.CasRepository.Companion.toDomain
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -61,7 +62,7 @@ class CasDtoTest {
             id = "1", groupId = "g",
             title = "Week 1", summary = "good",
             content = "<p>Hello&nbsp;<b>world</b></p>",
-            outcome = 3,
+            outcome = JsonPrimitive(3),
         )
         val d = dto.toDomain()
         assertEquals(LearningOutcome.INITIATIVE, d.outcome)
@@ -71,7 +72,18 @@ class CasDtoTest {
     @Test
     fun `reflection with null outcome yields null enum`() {
         assertNull(ReflectionDto(outcome = null).toDomain().outcome)
-        assertNull(ReflectionDto(outcome = 99).toDomain().outcome)
+        assertNull(ReflectionDto(outcome = JsonPrimitive(99)).toDomain().outcome)
+    }
+
+    @Test
+    fun `reflection accepts comma separated outcome string`() {
+        val dto = ReflectionDto(
+            id = "1",
+            groupId = "g",
+            outcome = JsonPrimitive("1,3"),
+            outcomeIdList = listOf(1, 3),
+        )
+        assertEquals(LearningOutcome.AWARENESS, dto.toDomain().outcome)
     }
 
     @Test

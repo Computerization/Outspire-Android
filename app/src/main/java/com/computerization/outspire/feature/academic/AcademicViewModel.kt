@@ -33,6 +33,16 @@ class AcademicViewModel @Inject constructor(
 
     fun retry() = loadYearsAndScores()
 
+    fun refresh() {
+        val yearId = _state.value.selectedYearId
+        if (yearId == null) {
+            loadYearsAndScores()
+            return
+        }
+        _state.value = _state.value.copy(loading = true, error = null)
+        loadScores(yearId)
+    }
+
     private fun loadYearsAndScores() {
         _state.value = _state.value.copy(loading = true, error = null)
         viewModelScope.launch {

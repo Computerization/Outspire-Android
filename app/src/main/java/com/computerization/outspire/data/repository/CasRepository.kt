@@ -13,6 +13,9 @@ import com.computerization.outspire.data.remote.dto.RecordDto
 import com.computerization.outspire.data.remote.dto.ReflectionDto
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
 
 @Singleton
 class CasRepository @Inject constructor(
@@ -117,7 +120,9 @@ class CasRepository @Inject constructor(
             title = title.orEmpty().trim(),
             summary = summary.orEmpty().trim(),
             contentPreview = stripHtml(content.orEmpty()).take(200),
-            outcome = LearningOutcome.from(outcome),
+            outcome = LearningOutcome.from(
+                outcomeIdList.firstOrNull() ?: outcomeCode(outcome),
+            ),
         )
 
         internal fun EvaluationDto.toDomain(): DomainEvaluation = DomainEvaluation(
@@ -156,5 +161,15 @@ class CasRepository @Inject constructor(
                 .replace("&quot;", "\"")
                 .replace(Regex("\\s+"), " ")
                 .trim()
+
+        private fun outcomeCode(value: kotlinx.serialization.json.JsonElement?): Int? {
+            val primitive = value?.jsonPrimitive ?: return null
+            return primitive.intOrNull
+                ?: primitive.content
+                    .split(',')
+                    .firstOrNull()
+                    ?.trim()
+                    ?.toIntOrNull()
+        }
     }
 }

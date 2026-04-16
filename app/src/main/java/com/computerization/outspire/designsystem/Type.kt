@@ -10,8 +10,8 @@ val OutspireTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
-        fontSize = 48.sp,
-        lineHeight = 52.sp,
+        fontSize = 40.sp,
+        lineHeight = 44.sp,
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
