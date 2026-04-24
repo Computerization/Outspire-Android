@@ -1,5 +1,21 @@
 pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "com.google.devtools.ksp") {
+                useModule("com.google.devtools.ksp:symbol-processing-gradle-plugin:${requested.version}")
+            }
+        }
+    }
     repositories {
+        gradlePluginPortal()
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
         maven {
             url = uri("https://maven.aliyun.com/repository/google")
             content {
@@ -8,17 +24,8 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
         maven { url = uri("https://maven.aliyun.com/repository/central") }
-        mavenCentral()
         maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
-        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {

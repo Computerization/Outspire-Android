@@ -48,11 +48,24 @@ data class ReflectionEditorState(
 
 data class BrowseState(
     val items: List<DomainCasGroup> = emptyList(),
+    val searchQuery: String = "",
     val pageIndex: Int = 0,
     val pageCount: Int = 1,
     val loading: Boolean = false,
     val error: String? = null,
 ) {
+    val filteredItems: List<DomainCasGroup>
+        get() {
+            val query = searchQuery.trim()
+            if (query.isBlank()) return items
+            return items.filter { group ->
+                group.name.contains(query, ignoreCase = true) ||
+                    group.teacher.contains(query, ignoreCase = true) ||
+                    group.groupNo.contains(query, ignoreCase = true) ||
+                    group.description.contains(query, ignoreCase = true)
+            }
+        }
+
     val hasMore: Boolean get() = pageIndex < pageCount
 }
 
