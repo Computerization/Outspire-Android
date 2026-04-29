@@ -101,6 +101,7 @@ fun CasScreen(viewModel: CasViewModel = hiltViewModel()) {
                             state = state.browse,
                             joiningId = state.joiningId,
                             onLoadMore = { viewModel.loadNextBrowsePage() },
+                            onSearchQueryChange = { viewModel.updateBrowseQuery(it) },
                             onJoin = { viewModel.join(it) },
                             onRetry = { viewModel.retryBrowse() },
                         )

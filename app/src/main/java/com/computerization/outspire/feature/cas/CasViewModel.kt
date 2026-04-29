@@ -90,11 +90,16 @@ class CasViewModel @Inject constructor(
                         it.copy(
                             browse = BrowseState(
                                 items = current.items + page.items,
+                                searchQuery = current.searchQuery,
                                 pageIndex = page.pageIndex,
                                 pageCount = page.pageCount,
                                 loading = false,
                             )
                         )
+                    }
+                    val updated = _state.value.browse
+                    if (updated.searchQuery.isNotBlank() && updated.hasMore && !updated.loading) {
+                        loadNextBrowsePage()
                     }
                 }
                 .onFailure { t ->
@@ -113,6 +118,14 @@ class CasViewModel @Inject constructor(
     fun retryBrowse() {
         _state.update { it.copy(browse = BrowseState()) }
         loadNextBrowsePage()
+    }
+
+    fun updateBrowseQuery(query: String) {
+        _state.update { it.copy(browse = it.browse.copy(searchQuery = query)) }
+        val browse = _state.value.browse
+        if (query.isNotBlank() && browse.hasMore && !browse.loading) {
+            loadNextBrowsePage()
+        }
     }
 
     fun join(group: DomainCasGroup) {
