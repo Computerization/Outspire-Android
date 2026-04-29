@@ -9,11 +9,17 @@ import androidx.compose.ui.graphics.Color
 
 private val LightBg = Color(0xFFF7F7FA)
 private val LightSurface = Color(0xFFFFFFFF)
+private val LightSurfaceVariant = Color(0xFFF0F1F6)
+private val LightOnSurfaceVariant = Color(0xFF2C2F3A)
+private val LightOutline = Color(0xFFD0D3DD)
 
 private val LightColors = lightColorScheme(
     primary = BrandTint,
     background = LightBg,
     surface = LightSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline,
 )
 
 private val DarkColors = darkColorScheme(

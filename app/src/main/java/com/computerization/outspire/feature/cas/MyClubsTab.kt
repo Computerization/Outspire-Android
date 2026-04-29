@@ -67,8 +67,8 @@ internal fun GroupCard(
                 Text("Teacher · ${group.teacher}", style = MaterialTheme.typography.bodySmall)
             }
             if (group.description.isNotBlank()) {
-                Text(
-                    group.description,
+                HtmlText(
+                    html = group.description,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 3,

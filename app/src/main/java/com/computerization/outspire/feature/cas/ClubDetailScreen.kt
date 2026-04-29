@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,8 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.heightIn
 import com.computerization.outspire.data.model.DomainCasGroup
 import com.computerization.outspire.data.model.DomainRecord
 import com.computerization.outspire.data.model.DomainReflection
@@ -62,12 +67,32 @@ fun ClubDetailScreen(
             verticalArrangement = Arrangement.spacedBy(AppSpace.cardSpacing),
         ) {
             Row(
-                Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = AppSpace.md, vertical = AppSpace.sm),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(group.name, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                TextButton(onClick = onBack) { Text("Back") }
+                Text(
+                    group.name,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        shadow = Shadow(
+                            color = Color.Black.copy(alpha = 0.45f),
+                            offset = Offset(0f, 2f),
+                            blurRadius = 8f,
+                        ),
+                    ),
+                    color = Color.White,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(
+                    onClick = onBack,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color.White,
+                    ),
+                ) {
+                    Text("Back")
+                }
             }
 
             IntroCard(group)
@@ -82,9 +107,11 @@ fun ClubDetailScreen(
                 }
             }
 
-            when (tab) {
-                DetailTab.Records -> RecordsList(records, onRetry, onEditRecord, onDeleteRecord)
-                DetailTab.Reflections -> ReflectionsList(reflections, onRetry, onEditReflection, onDeleteReflection)
+            Box(Modifier.weight(1f, fill = true)) {
+                when (tab) {
+                    DetailTab.Records -> RecordsList(records, onRetry, onEditRecord, onDeleteRecord)
+                    DetailTab.Reflections -> ReflectionsList(reflections, onRetry, onEditReflection, onDeleteReflection)
+                }
             }
         }
 
@@ -102,7 +129,9 @@ fun ClubDetailScreen(
 @Composable
 private fun IntroCard(group: DomainCasGroup) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 280.dp),
         shape = RoundedCornerShape(AppRadius.card),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     ) {
@@ -124,10 +153,12 @@ private fun IntroCard(group: DomainCasGroup) {
                 )
             }
             if (group.description.isNotBlank()) {
-                Text(
-                    group.description,
+                HtmlText(
+                    html = group.description,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp, max = 220.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = Int.MAX_VALUE,
                 )
             } else {
                 Text(
@@ -281,4 +312,3 @@ private fun ReflectionRow(reflection: DomainReflection, onEdit: () -> Unit, onDe
         )
     }
 }
-

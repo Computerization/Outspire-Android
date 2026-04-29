@@ -12,6 +12,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
@@ -38,26 +42,36 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.computerization.outspire.data.model.DomainScore
 import com.computerization.outspire.designsystem.AppRadius
 import com.computerization.outspire.designsystem.AppSpace
+import com.computerization.outspire.designsystem.OutspireScreen
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AcademicScreen(
     viewModel: AcademicViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = AppSpace.md, vertical = AppSpace.lg),
-        verticalArrangement = Arrangement.spacedBy(AppSpace.cardSpacing),
-    ) {
-        Text(
-            text = "Academic",
-            style = MaterialTheme.typography.displayLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.loading,
+        onRefresh = viewModel::refresh,
+    )
 
+    OutspireScreen(
+        title = "Academic",
+        onRefresh = viewModel::refresh,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .pullRefresh(pullRefreshState),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = AppSpace.md, vertical = AppSpace.lg),
+                verticalArrangement = Arrangement.spacedBy(AppSpace.cardSpacing),
+            ) {
         var expanded by remember { mutableStateOf(false) }
         val selectedLabel = state.yearOptions
             .firstOrNull { it.id == state.selectedYearId }?.name
@@ -120,6 +134,16 @@ fun AcademicScreen(
                     items(state.scores, key = { it.subject }) { ScoreRow(it) }
                 }
             }
+        }
+            }
+
+            PullRefreshIndicator(
+                refreshing = state.loading,
+                state = pullRefreshState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = AppSpace.xs),
+            )
         }
     }
 }

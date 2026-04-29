@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
@@ -29,6 +30,8 @@ class TodayViewModel @Inject constructor(
 
     private val classesFlow = MutableStateFlow<List<DomainClass>?>(null)
     private val errorFlow = MutableStateFlow<String?>(null)
+    private val _refreshing = MutableStateFlow(false)
+    val refreshing: StateFlow<Boolean> = _refreshing.asStateFlow()
 
     init {
         load()
@@ -56,10 +59,12 @@ class TodayViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
+            _refreshing.value = true
             if (BuildConfig.USE_MOCK_BACKEND) {
                 classesFlow.value = MockClasstable.today.map {
                     DomainClass(it.subject, it.teacher, it.room, it.start, it.end)
                 }
+                _refreshing.value = false
                 return@launch
             }
             repository.todayClasses()
@@ -70,6 +75,7 @@ class TodayViewModel @Inject constructor(
                 .onFailure { t ->
                     errorFlow.value = t.message ?: "Failed to load timetable"
                 }
+            _refreshing.value = false
         }
     }
 
